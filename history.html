@@ -1,0 +1,883 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>历史记录 - 手语医疗助手</title>
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;600;700;800&display=swap">
+  <link rel="icon" href="img/favicon.ico" type="image/x-icon">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <style>
+    /* 历史记录页面特有样式 */
+    .history-page {
+      background: linear-gradient(135deg, #f8fafc 0%, #f0f9ff 100%);
+      min-height: 100vh;
+    }
+
+    .history-container {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: var(--spacing-xl);
+    }
+
+    .history-header {
+      margin-bottom: var(--spacing-2xl);
+    }
+
+    .stats-overview {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: var(--spacing-xl);
+      margin-bottom: var(--spacing-2xl);
+    }
+
+    .stat-card-lg {
+      background: white;
+      border-radius: var(--radius-2xl);
+      padding: var(--spacing-xl);
+      box-shadow: var(--shadow-lg);
+      border: 1px solid var(--gray-200);
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      gap: var(--spacing-lg);
+    }
+
+    .stat-card-lg:hover {
+      transform: translateY(-4px);
+      border-color: var(--primary-blue-300);
+      box-shadow: var(--shadow-xl);
+    }
+
+    .stat-icon {
+      width: 70px;
+      height: 70px;
+      border-radius: var(--radius-xl);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.75rem;
+      flex-shrink: 0;
+    }
+
+    .stat-icon.total {
+      background: linear-gradient(135deg, var(--primary-blue-100), var(--primary-blue-50));
+      color: var(--primary-blue-600);
+    }
+
+    .stat-icon.today {
+      background: linear-gradient(135deg, var(--secondary-teal-100), var(--secondary-teal-50));
+      color: var(--secondary-teal-600);
+    }
+
+    .stat-icon.accuracy {
+      background: linear-gradient(135deg, var(--success-color-light), var(--success-color-lighter));
+      color: var(--success-color);
+    }
+
+    .stat-icon.most {
+      background: linear-gradient(135deg, var(--warning-color-light), var(--warning-color-lighter));
+      color: var(--warning-color);
+    }
+
+    .stat-content {
+      flex: 1;
+    }
+
+    .stat-number-lg {
+      font-size: var(--font-size-3xl);
+      font-weight: 800;
+      color: var(--gray-900);
+      margin-bottom: var(--spacing-xs);
+    }
+
+    .stat-label-lg {
+      font-size: var(--font-size-base);
+      color: var(--gray-600);
+      font-weight: 500;
+    }
+
+    .stat-trend {
+      font-size: var(--font-size-sm);
+      padding: var(--spacing-xs) var(--spacing-md);
+      border-radius: var(--radius-full);
+      display: inline-block;
+      margin-top: var(--spacing-xs);
+      font-weight: 600;
+    }
+
+    .trend-up {
+      background: rgba(16, 185, 129, 0.1);
+      color: var(--success-color);
+    }
+
+    .trend-down {
+      background: rgba(239, 68, 68, 0.1);
+      color: var(--danger-color);
+    }
+
+    .filters-section {
+      background: white;
+      border-radius: var(--radius-2xl);
+      padding: var(--spacing-xl);
+      box-shadow: var(--shadow-lg);
+      border: 1px solid var(--gray-200);
+      margin-bottom: var(--spacing-2xl);
+    }
+
+    .filter-row {
+      display: flex;
+      gap: var(--spacing-lg);
+      margin-bottom: var(--spacing-lg);
+      flex-wrap: wrap;
+    }
+
+    .filter-group {
+      flex: 1;
+      min-width: 200px;
+    }
+
+    .filter-group-full {
+      flex: 1 1 100%;
+      max-width: 600px;
+    }
+
+    .filter-label {
+      display: block;
+      font-size: var(--font-size-sm);
+      font-weight: 600;
+      color: var(--gray-700);
+      margin-bottom: var(--spacing-sm);
+    }
+
+    .filter-select {
+      width: 100%;
+      padding: var(--spacing-md) var(--spacing-lg);
+      border: 2px solid var(--gray-300);
+      border-radius: var(--radius-lg);
+      font-family: var(--font-family);
+      font-size: var(--font-size-base);
+      color: var(--gray-700);
+      background: white;
+      transition: all 0.3s ease;
+      cursor: pointer;
+    }
+
+    .filter-select:focus {
+      outline: none;
+      border-color: var(--primary-blue-500);
+      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+    }
+
+    .date-range {
+      display: flex;
+      align-items: center;
+      gap: var(--spacing-md);
+    }
+
+    .date-range input {
+      flex: 1;
+      padding: var(--spacing-md) var(--spacing-lg);
+      border: 2px solid var(--gray-300);
+      border-radius: var(--radius-lg);
+      font-family: var(--font-family);
+      font-size: var(--font-size-base);
+      color: var(--gray-700);
+      background: white;
+      transition: all 0.3s ease;
+    }
+
+    .date-range input:focus {
+      outline: none;
+      border-color: var(--primary-blue-500);
+      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+    }
+
+    .date-separator {
+      color: var(--gray-500);
+      font-weight: 600;
+    }
+
+    .filter-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: var(--spacing-md);
+      padding-top: var(--spacing-lg);
+      border-top: 1px solid var(--gray-200);
+    }
+
+    .history-content {
+      display: grid;
+      grid-template-columns: 2fr 1fr;
+      gap: var(--spacing-xl);
+      margin-bottom: var(--spacing-2xl);
+    }
+
+    @media (max-width: 1024px) {
+      .history-content {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .records-section {
+      background: white;
+      border-radius: var(--radius-2xl);
+      padding: var(--spacing-xl);
+      box-shadow: var(--shadow-lg);
+      border: 1px solid var(--gray-200);
+      height: fit-content;
+    }
+
+    .records-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: var(--spacing-xl);
+      padding-bottom: var(--spacing-md);
+      border-bottom: 2px solid var(--gray-100);
+    }
+
+    .records-actions {
+      display: flex;
+      gap: var(--spacing-sm);
+    }
+
+    .records-list {
+      max-height: 600px;
+      overflow-y: auto;
+      scrollbar-width: thin;
+      scrollbar-color: var(--primary-blue-400) var(--gray-200);
+    }
+
+    .records-list::-webkit-scrollbar {
+      width: 6px;
+    }
+
+    .records-list::-webkit-scrollbar-track {
+      background: var(--gray-200);
+      border-radius: 3px;
+    }
+
+    .records-list::-webkit-scrollbar-thumb {
+      background: var(--primary-blue-400);
+      border-radius: 3px;
+    }
+
+    .records-list::-webkit-scrollbar-thumb:hover {
+      background: var(--primary-blue-500);
+    }
+
+    .record-item {
+      display: grid;
+      grid-template-columns: auto 1fr auto;
+      gap: var(--spacing-lg);
+      padding: var(--spacing-lg);
+      border-bottom: 1px solid var(--gray-100);
+      cursor: pointer;
+      transition: all 0.3s ease;
+      align-items: center;
+    }
+
+    .record-item:hover {
+      background: var(--gray-50);
+      border-radius: var(--radius-lg);
+    }
+
+    .record-item:last-child {
+      border-bottom: none;
+    }
+
+    .record-status {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+
+    .status-success {
+      background: var(--success-color);
+      box-shadow: 0 0 8px rgba(16, 185, 129, 0.4);
+    }
+
+    .status-warning {
+      background: var(--warning-color);
+      box-shadow: 0 0 8px rgba(245, 158, 11, 0.4);
+    }
+
+    .status-error {
+      background: var(--danger-color);
+      box-shadow: 0 0 8px rgba(239, 68, 68, 0.4);
+    }
+
+    .record-details {
+      flex: 1;
+    }
+
+    .record-title {
+      font-weight: 700;
+      color: var(--gray-900);
+      margin-bottom: var(--spacing-xs);
+      font-size: var(--font-size-base);
+    }
+
+    .record-description {
+      color: var(--gray-600);
+      font-size: var(--font-size-sm);
+      margin-bottom: var(--spacing-xs);
+      line-height: 1.5;
+    }
+
+    .record-meta {
+      display: flex;
+      gap: var(--spacing-lg);
+      font-size: var(--font-size-xs);
+      color: var(--gray-500);
+    }
+
+    .record-meta-item {
+      display: flex;
+      align-items: center;
+      gap: var(--spacing-xs);
+    }
+
+    .record-meta-item i {
+      font-size: 0.875rem;
+    }
+
+    .record-actions {
+      display: flex;
+      gap: var(--spacing-xs);
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+
+    .record-item:hover .record-actions {
+      opacity: 1;
+    }
+
+    .record-action-btn {
+      width: 36px;
+      height: 36px;
+      border-radius: var(--radius-md);
+      border: none;
+      background: var(--gray-100);
+      color: var(--gray-600);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .record-action-btn:hover {
+      background: var(--primary-blue-100);
+      color: var(--primary-blue-700);
+      transform: rotate(15deg);
+    }
+
+    .empty-records {
+      text-align: center;
+      padding: var(--spacing-2xl);
+      color: var(--gray-500);
+    }
+
+    .empty-records i {
+      font-size: 3rem;
+      margin-bottom: var(--spacing-lg);
+      opacity: 0.6;
+    }
+
+    .empty-records h3 {
+      font-size: var(--font-size-lg);
+      color: var(--gray-700);
+      margin-bottom: var(--spacing-sm);
+    }
+
+    .empty-records p {
+      font-size: var(--font-size-sm);
+      max-width: 400px;
+      margin: 0 auto;
+      line-height: 1.6;
+    }
+
+    .charts-section {
+      background: white;
+      border-radius: var(--radius-2xl);
+      padding: var(--spacing-xl);
+      box-shadow: var(--shadow-lg);
+      border: 1px solid var(--gray-200);
+      height: fit-content;
+    }
+
+    .chart-container {
+      height: 300px;
+      margin-bottom: var(--spacing-xl);
+      position: relative;
+      padding: var(--spacing-md);
+      background: white;
+      border-radius: var(--radius-lg);
+      border: 1px solid var(--gray-200);
+    }
+
+    .chart-container canvas {
+      max-height: 100%;
+      width: 100% !important;
+      height: 100% !important;
+    }
+
+    .chart-placeholder {
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(135deg, var(--gray-50), white);
+      border-radius: var(--radius-lg);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--gray-400);
+      border: 2px dashed var(--gray-300);
+    }
+
+    .chart-legend {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--spacing-md);
+      justify-content: center;
+      margin-top: var(--spacing-lg);
+    }
+
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: var(--spacing-xs);
+      font-size: var(--font-size-sm);
+      color: var(--gray-700);
+    }
+
+    .legend-color {
+      width: 12px;
+      height: 12px;
+      border-radius: 2px;
+    }
+
+    .insights-section {
+      background: linear-gradient(135deg, var(--primary-blue-50), var(--secondary-teal-50));
+      border-radius: var(--radius-2xl);
+      padding: var(--spacing-2xl);
+      border: 1px solid var(--gray-200);
+      margin-bottom: var(--spacing-2xl);
+    }
+
+    .insights-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: var(--spacing-xl);
+      margin-top: var(--spacing-xl);
+    }
+
+    .insight-card {
+      background: white;
+      border-radius: var(--radius-xl);
+      padding: var(--spacing-xl);
+      border: 1px solid var(--gray-200);
+      transition: all 0.3s ease;
+    }
+
+    .insight-card:hover {
+      transform: translateY(-4px);
+      border-color: var(--primary-blue-300);
+      box-shadow: var(--shadow-md);
+    }
+
+    .insight-icon {
+      width: 48px;
+      height: 48px;
+      background: linear-gradient(135deg, var(--primary-blue-100), var(--secondary-teal-100));
+      border-radius: var(--radius-lg);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.25rem;
+      color: var(--primary-blue-600);
+      margin-bottom: var(--spacing-lg);
+    }
+
+    .insight-title {
+      font-size: var(--font-size-lg);
+      font-weight: 700;
+      color: var(--gray-900);
+      margin-bottom: var(--spacing-md);
+    }
+
+    .insight-content {
+      color: var(--gray-600);
+      line-height: 1.6;
+      font-size: var(--font-size-sm);
+    }
+
+    .export-section {
+      background: white;
+      border-radius: var(--radius-2xl);
+      padding: var(--spacing-xl);
+      box-shadow: var(--shadow-lg);
+      border: 1px solid var(--gray-200);
+      text-align: center;
+    }
+
+    .export-options {
+      display: flex;
+      justify-content: center;
+      gap: var(--spacing-lg);
+      margin-top: var(--spacing-xl);
+      flex-wrap: wrap;
+    }
+
+    .export-btn {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: var(--spacing-sm);
+      padding: var(--spacing-lg);
+      background: var(--gray-50);
+      border: 2px solid var(--gray-200);
+      border-radius: var(--radius-xl);
+      cursor: pointer;
+      transition: all 0.3s ease;
+      min-width: 120px;
+    }
+
+    .export-btn:hover {
+      background: white;
+      border-color: var(--primary-blue-400);
+      transform: translateY(-4px);
+      box-shadow: var(--shadow-md);
+    }
+
+    .export-icon {
+      width: 48px;
+      height: 48px;
+      background: linear-gradient(135deg, var(--primary-blue-500), var(--secondary-teal-500));
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-size: 1.25rem;
+    }
+
+    .export-label {
+      font-weight: 600;
+      color: var(--gray-800);
+    }
+
+    @media (max-width: 768px) {
+      .stats-overview {
+        grid-template-columns: 1fr;
+      }
+
+      .filter-row {
+        flex-direction: column;
+      }
+
+      .date-range {
+        flex-direction: column;
+        align-items: stretch;
+      }
+
+      .insights-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .export-options {
+        flex-direction: column;
+        align-items: center;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .record-item {
+        grid-template-columns: 1fr;
+        gap: var(--spacing-md);
+      }
+
+      .record-status {
+        display: none;
+      }
+
+      .record-meta {
+        flex-direction: column;
+        gap: var(--spacing-xs);
+      }
+    }
+  </style>
+</head>
+<body class="history-page">
+<!-- 背景装饰 -->
+<div class="background-deco"></div>
+
+<!-- 导航栏将通过JavaScript插入 -->
+
+<main class="main-content">
+  <div class="history-container">
+    <!-- 历史记录标题 -->
+    <div class="history-header">
+      <h1 class="section-title">历史记录与分析</h1>
+      <p class="section-subtitle">查看您的手语识别历史记录，分析使用习惯和进步情况</p>
+      <div class="section-divider"></div>
+    </div>
+
+    <!-- 统计概览 -->
+    <div class="stats-overview">
+      <div class="stat-card-lg">
+        <div class="stat-icon total">
+          <i class="fas fa-history"></i>
+        </div>
+        <div class="stat-content">
+          <div class="stat-number-lg">1,247</div>
+          <div class="stat-label-lg">总识别次数</div>
+          <span class="stat-trend trend-up">
+                            <i class="fas fa-arrow-up"></i>
+                            比昨天增加 12%
+                        </span>
+        </div>
+      </div>
+
+      <div class="stat-card-lg">
+        <div class="stat-icon today">
+          <i class="fas fa-calendar-day"></i>
+        </div>
+        <div class="stat-content">
+          <div class="stat-number-lg">23</div>
+          <div class="stat-label-lg">今日识别次数</div>
+          <span class="stat-trend trend-up">
+                            <i class="fas fa-arrow-up"></i>
+                            比昨天增加 28%
+                        </span>
+        </div>
+      </div>
+
+      <div class="stat-card-lg">
+        <div class="stat-icon accuracy">
+          <i class="fas fa-bullseye"></i>
+        </div>
+        <div class="stat-content">
+          <div class="stat-number-lg">92.5%</div>
+          <div class="stat-label-lg">平均识别准确率</div>
+        </div>
+      </div>
+
+      <div class="stat-card-lg">
+        <div class="stat-icon most">
+          <i class="fas fa-star"></i>
+        </div>
+        <div class="stat-content">
+          <div class="stat-number-lg">头痛</div>
+          <div class="stat-label-lg">最常识别症状</div>
+          <span class="stat-trend trend-down">
+                            <i class="fas fa-arrow-down"></i>
+                            比昨天减少 8%
+                        </span>
+        </div>
+      </div>
+    </div>
+
+    <!-- 筛选条件 -->
+    <section class="filters-section">
+      <div class="filter-row">
+        <div class="filter-group">
+          <label class="filter-label">时间范围</label>
+          <select class="filter-select" id="timeRange">
+            <option value="today">今天</option>
+            <option value="yesterday">昨天</option>
+            <option value="week">本周</option>
+            <option value="month" selected>本月</option>
+            <option value="year">今年</option>
+            <option value="all">全部时间</option>
+          </select>
+        </div>
+
+        <div class="filter-group">
+          <label class="filter-label">识别类型</label>
+          <select class="filter-select" id="recognitionType">
+            <option value="all">全部类型</option>
+            <option value="symptom">症状识别</option>
+            <option value="body">部位识别</option>
+            <option value="action">动作识别</option>
+          </select>
+        </div>
+
+        <div class="filter-group">
+          <label class="filter-label">置信度</label>
+          <select class="filter-select" id="confidenceLevel">
+            <option value="all">全部</option>
+            <option value="high">高 (≥85%)</option>
+            <option value="medium">中 (70-85%)</option>
+            <option value="low">低 (&lt;70%)</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="filter-row">
+        <div class="filter-group filter-group-full">
+          <label class="filter-label">自定义日期</label>
+          <div class="date-range">
+            <input type="date" id="startDate" value="2025-01-01">
+            <span class="date-separator">至</span>
+            <input type="date" id="endDate" value="">
+          </div>
+        </div>
+      </div>
+
+      <div class="filter-actions">
+        <button class="btn btn-outline" id="resetFilters">
+          <i class="fas fa-redo"></i>
+          重置筛选
+        </button>
+        <button class="btn btn-primary" id="applyFilters">
+          <i class="fas fa-filter"></i>
+          应用筛选
+        </button>
+      </div>
+    </section>
+
+    <!-- 主要内容区域 -->
+    <div class="history-content">
+      <!-- 左侧：记录列表 -->
+      <section class="records-section">
+        <div class="records-header">
+          <h2>
+            <i class="fas fa-list"></i>
+            识别记录
+          </h2>
+          <div class="records-actions">
+            <button class="btn btn-sm btn-outline" id="selectAll">
+              <i class="fas fa-check-square"></i>
+              全选
+            </button>
+            <button class="btn btn-sm btn-danger" id="deleteSelected">
+              <i class="fas fa-trash"></i>
+              删除选中
+            </button>
+          </div>
+        </div>
+
+        <div class="records-list" id="recordsList">
+          <!-- 记录将通过JavaScript动态生成 -->
+        </div>
+      </section>
+
+      <!-- 右侧：图表分析 -->
+      <section class="charts-section">
+        <h2>
+          <i class="fas fa-chart-line"></i>
+          识别趋势
+        </h2>
+
+        <div class="chart-container">
+          <canvas id="trendChart"></canvas>
+        </div>
+      </section>
+    </div>
+
+    <!-- 分析洞察 -->
+    <section class="insights-section">
+      <div class="section-header">
+        <h2>
+          <i class="fas fa-lightbulb"></i>
+          使用洞察
+        </h2>
+        <p class="section-subtitle">基于您的使用数据，我们发现以下规律和建议</p>
+      </div>
+
+      <div class="insights-grid">
+        <div class="insight-card">
+          <div class="insight-icon">
+            <i class="fas fa-clock"></i>
+          </div>
+          <h3 class="insight-title">活跃时间段</h3>
+          <p class="insight-content">
+            您最活跃的时间是 <strong>上午10:00-12:00</strong>，
+            平均每天在此时间段进行8次识别。
+            建议保持这一良好的学习习惯。
+          </p>
+        </div>
+
+        <div class="insight-card">
+          <div class="insight-icon">
+            <i class="fas fa-trophy"></i>
+          </div>
+          <h3 class="insight-title">进步显著</h3>
+          <p class="insight-content">
+            与上月相比，您的识别准确率提升了 <strong>15.2%</strong>，
+            平均置信度从78%提高到92%，进步非常明显！
+          </p>
+        </div>
+
+        <div class="insight-card">
+          <div class="insight-icon">
+            <i class="fas fa-book"></i>
+          </div>
+          <h3 class="insight-title">学习建议</h3>
+          <p class="insight-content">
+            您对"呼吸系统"相关词汇掌握较好，但对"消化系统"
+            词汇识别准确率较低，建议重点练习相关手语。
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- 数据导出 -->
+    <section class="export-section">
+      <h2>
+        <i class="fas fa-download"></i>
+        数据导出
+      </h2>
+      <p class="section-subtitle">导出您的历史记录数据，用于进一步分析或备份</p>
+
+      <div class="export-options">
+        <div class="export-btn" data-format="pdf">
+          <div class="export-icon">
+            <i class="fas fa-file-pdf"></i>
+          </div>
+          <div class="export-label">PDF格式</div>
+        </div>
+
+        <div class="export-btn" data-format="csv">
+          <div class="export-icon">
+            <i class="fas fa-file-csv"></i>
+          </div>
+          <div class="export-label">CSV格式</div>
+        </div>
+
+        <div class="export-btn" data-format="excel">
+          <div class="export-icon">
+            <i class="fas fa-file-excel"></i>
+          </div>
+          <div class="export-label">Excel格式</div>
+        </div>
+
+        <div class="export-btn" data-format="json">
+          <div class="export-icon">
+            <i class="fas fa-code"></i>
+          </div>
+          <div class="export-label">JSON格式</div>
+        </div>
+      </div>
+
+      <div class="mt-4">
+        <button class="btn btn-primary btn-lg" id="exportAll">
+          <i class="fas fa-download"></i>
+          导出所有记录
+        </button>
+      </div>
+    </section>
+  </div>
+</main>
+
+<!-- 页脚将通过JavaScript插入 -->
+
+<script type="module" src="script.js"></script>
+<script type="module" src="history-script.js"></script>
+</body>
+</html>

@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>手语医疗助手 - 首页</title>
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;600;700;800&display=swap">
+  <link rel="icon" href="img/favicon.ico" type="image/x-icon">
+</head>
+<body>
+<!-- 背景装饰 -->
+<div class="background-deco"></div>
+
+<!-- 导航栏将通过JavaScript插入 -->
+
+<main class="main-content">
+  <!-- 英雄区域 -->
+  <section class="hero-section container">
+    <div class="hero-content">
+      <h1 class="hero-title">
+        手语医疗助手
+        <span class="highlight">消除沟通障碍</span>
+        让医疗服务更平等
+      </h1>
+      <p class="hero-subtitle">
+        专为听障人士设计的智能医疗辅助系统，通过先进的手语识别技术，
+        帮助患者与医生建立顺畅沟通，提供精准的医疗诊断支持。
+      </p>
+
+      <div class="hero-actions">
+        <a href="diagnosis.html" class="btn btn-primary btn-lg btn-glow">
+          <i class="fas fa-play-circle"></i>
+          开始手语诊断
+        </a>
+        <a href="dictionary.html" class="btn btn-outline btn-lg">
+          <i class="fas fa-book"></i>
+          学习手语词库
+        </a>
+      </div>
+
+      <div class="hero-stats">
+        <div class="stat-item">
+          <div class="stat-label">服务听障人群</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-label">学习医疗手语词汇</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-label">医患沟通无忧</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="hero-image">
+      <div class="floating-elements">
+        <div class="floating-element element-1">
+          <i class="fas fa-heartbeat"></i>
+        </div>
+        <div class="floating-element element-2">
+          <i class="fas fa-stethoscope"></i>
+        </div>
+        <div class="floating-element element-3">
+          <i class="fas fa-hand-paper"></i>
+        </div>
+      </div>
+      <div class="image-container">
+        <div class="mockup-screen">
+          <div class="screen-header">
+            <div class="screen-dots">
+              <div class="dot red"></div>
+              <div class="dot yellow"></div>
+              <div class="dot green"></div>
+            </div>
+          </div>
+          <div class="screen-content">
+            <div class="recognition-result">
+              <div class="result-text">手语识别结果: 头痛</div>
+              <div class="result-confidence">
+                <span>准确率:</span>
+                <div class="confidence-bar">
+                  <div class="confidence-fill" style="width: 92%"></div>
+                </div>
+                <span>92%</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 功能介绍 -->
+  <section class="features-section container">
+    <div class="section-header">
+      <h2 class="section-title">核心功能</h2>
+      <p class="section-subtitle">
+        整合先进技术，为听障人士提供全方位的医疗沟通支持
+      </p>
+      <div class="section-divider"></div>
+    </div>
+
+    <div class="features-grid">
+      <div class="feature-card">
+        <div class="feature-icon">
+          <i class="fas fa-camera"></i>
+        </div>
+        <h3 class="feature-title">实时手语识别</h3>
+        <p class="feature-description">
+          通过摄像头实时捕捉手语动作，采用MediaPipe手部检测和MobileNetV2深度学习模型，
+          精准识别多种医疗场景下的手语表达。
+        </p>
+        <span class="feature-badge">深度学习</span>
+      </div>
+
+      <div class="feature-card">
+        <div class="feature-icon">
+          <i class="fas fa-comment-medical"></i>
+        </div>
+        <h3 class="feature-title">智能诊断引导</h3>
+        <p class="feature-description">
+          系统主动提问引导患者描述症状，生成标准化病历，
+          帮助医生快速了解病情。
+        </p>
+        <span class="feature-badge">智能交互</span>
+      </div>
+
+      <div class="feature-card">
+        <div class="feature-icon">
+          <i class="fas fa-file-medical"></i>
+        </div>
+        <h3 class="feature-title">就医辅助卡生成</h3>
+        <p class="feature-description">
+          自动生成包含症状描述的标准化卡片，
+          方便患者携带并与医生沟通。
+        </p>
+        <span class="feature-badge">实用工具</span>
+      </div>
+
+      <div class="feature-card">
+        <div class="feature-icon">
+          <i class="fas fa-book-medical"></i>
+        </div>
+        <h3 class="feature-title">医疗手语词库</h3>
+        <p class="feature-description">
+          内置丰富的医疗专用手语词汇，
+          支持学习和查询，提升沟通效率。
+        </p>
+        <span class="feature-badge">教育资源</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- 使用流程 -->
+  <section class="workflow-section container">
+    <div class="section-header">
+      <h2 class="section-title">简单三步，轻松使用</h2>
+      <p class="section-subtitle">
+        直观的操作流程，让手语沟通变得简单高效
+      </p>
+      <div class="section-divider"></div>
+    </div>
+
+    <div class="workflow-steps">
+      <div class="step">
+        <div class="step-number">1</div>
+        <div class="step-content">
+          <h3>启动摄像头</h3>
+          <p>授权访问摄像头，确保手部在画面中央</p>
+        </div>
+        <div class="step-icon">
+          <i class="fas fa-video"></i>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-number">2</div>
+        <div class="step-content">
+          <h3>做手语动作</h3>
+          <p>根据系统引导，做出相应的医疗手语动作</p>
+        </div>
+        <div class="step-icon">
+          <i class="fas fa-hand-paper"></i>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-number">3</div>
+        <div class="step-content">
+          <h3>获取诊断结果</h3>
+          <p>系统识别并生成诊断报告和就医卡片</p>
+        </div>
+        <div class="step-icon">
+          <i class="fas fa-file-medical-alt"></i>
+        </div>
+      </div>
+
+      <div class="step-line"></div>
+    </div>
+  </section>
+
+  <!-- 行动号召 -->
+  <section class="cta-section container">
+    <div class="cta-content">
+      <h2 class="cta-title">立即开始您的无障碍就医体验</h2>
+      <p class="cta-description">
+        无论是常规检查还是紧急情况，手语医疗助手都能为您提供可靠的沟通支持。
+        无需手语翻译陪同，独立完成就医沟通。
+      </p>
+      <div class="hero-actions">
+        <a href="diagnosis.html" class="btn btn-primary btn-lg">
+          <i class="fas fa-rocket"></i>
+          立即体验
+        </a>
+        <a href="dictionary.html" class="btn btn-outline btn-lg">
+          <i class="fas fa-graduation-cap"></i>
+          学习手语
+        </a>
+      </div>
+    </div>
+
+    <div class="cta-image">
+      <div class="doctor-illustration">
+        <div class="doctor-icon">
+          <i class="fas fa-user-md"></i>
+        </div>
+        <div class="connection-line"></div>
+        <div class="patient-icon">
+          <i class="fas fa-user-injured"></i>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<!-- 页脚将通过JavaScript插入 -->
+
+<script type="module" src="script.js"></script>
+</body>
+</html>

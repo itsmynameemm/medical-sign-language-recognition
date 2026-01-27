@@ -1,0 +1,795 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>手语词库 - 手语医疗助手</title>
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;600;700;800&display=swap">
+  <link rel="icon" href="img/favicon.ico" type="image/x-icon">
+  <style>
+    /* 词库页面特有样式 */
+    .dictionary-page {
+      background: linear-gradient(135deg, #f8fafc 0%, #f0f9ff 100%);
+      min-height: 100vh;
+    }
+
+    .dictionary-container {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: var(--spacing-xl);
+    }
+
+    .dictionary-header {
+      margin-bottom: var(--spacing-2xl);
+    }
+
+    .search-section {
+      background: white;
+      border-radius: var(--radius-2xl);
+      padding: var(--spacing-2xl);
+      box-shadow: var(--shadow-lg);
+      border: 1px solid var(--gray-200);
+      margin-bottom: var(--spacing-2xl);
+    }
+
+    .search-bar {
+      display: flex;
+      gap: var(--spacing-md);
+      margin-bottom: var(--spacing-lg);
+    }
+
+    .search-input {
+      flex: 1;
+      position: relative;
+    }
+
+    .search-input i {
+      position: absolute;
+      left: var(--spacing-lg);
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--gray-500);
+      z-index: 1;
+    }
+
+    .search-input input {
+      width: 100%;
+      padding: var(--spacing-lg) var(--spacing-lg) var(--spacing-lg) 48px;
+      border: 2px solid var(--gray-300);
+      border-radius: var(--radius-xl);
+      font-size: var(--font-size-base);
+      background: var(--gray-50);
+      transition: all 0.3s ease;
+    }
+
+    .search-input input:focus {
+      background: white;
+      border-color: var(--primary-blue-500);
+      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+      outline: none;
+    }
+
+    .search-filters {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--spacing-md);
+      margin-bottom: var(--spacing-lg);
+    }
+
+    .filter-tag {
+      padding: var(--spacing-sm) var(--spacing-lg);
+      background: var(--gray-100);
+      border: 1px solid var(--gray-300);
+      border-radius: var(--radius-full);
+      font-size: var(--font-size-sm);
+      font-weight: 500;
+      color: var(--gray-700);
+      cursor: pointer;
+      transition: all 0.3s ease;
+      user-select: none;
+    }
+
+    .filter-tag:hover {
+      background: var(--primary-blue-100);
+      border-color: var(--primary-blue-300);
+      color: var(--primary-blue-700);
+      transform: translateY(-2px);
+    }
+
+    .filter-tag.active {
+      background: linear-gradient(135deg, var(--primary-blue-500), var(--primary-blue-600));
+      color: white;
+      border-color: var(--primary-blue-600);
+      box-shadow: 0 4px 12px rgba(59, 130, 246, 0.2);
+    }
+
+    .search-stats {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-top: var(--spacing-lg);
+      border-top: 1px solid var(--gray-200);
+      font-size: var(--font-size-sm);
+      color: var(--gray-600);
+    }
+
+    .words-section {
+      background: white;
+      border-radius: var(--radius-2xl);
+      padding: var(--spacing-2xl);
+      box-shadow: var(--shadow-lg);
+      border: 1px solid var(--gray-200);
+      margin-bottom: var(--spacing-2xl);
+    }
+
+    .words-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+      gap: var(--spacing-xl);
+      margin-top: var(--spacing-xl);
+    }
+
+    .word-card {
+      background: white;
+      border-radius: var(--radius-xl);
+      padding: var(--spacing-xl);
+      border: 1px solid var(--gray-200);
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      position: relative;
+      overflow: hidden;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .word-card:hover {
+      transform: translateY(-6px) scale(1.02);
+      border-color: var(--primary-blue-300);
+      box-shadow: var(--shadow-xl);
+    }
+
+    .word-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 4px;
+      height: 100%;
+      background: linear-gradient(to bottom, var(--primary-blue-500), var(--secondary-teal-500));
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+
+    .word-card:hover::before {
+      opacity: 1;
+    }
+
+    .word-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: var(--spacing-lg);
+    }
+
+    .word-text {
+      flex: 1;
+    }
+
+    .word-chinese {
+      font-size: var(--font-size-xl);
+      font-weight: 700;
+      color: var(--gray-900);
+      margin-bottom: 4px;
+    }
+
+    .word-pinyin {
+      font-size: var(--font-size-sm);
+      color: var(--gray-500);
+      font-style: italic;
+    }
+
+    .word-category {
+      padding: var(--spacing-xs) var(--spacing-md);
+      background: linear-gradient(135deg, var(--secondary-teal-50), var(--primary-blue-50));
+      color: var(--primary-blue-700);
+      border-radius: var(--radius-full);
+      font-size: var(--font-size-xs);
+      font-weight: 600;
+      border: 1px solid var(--primary-blue-200);
+    }
+
+    .word-image {
+      width: 100%;
+      height: 180px;
+      background: linear-gradient(135deg, var(--primary-blue-50), var(--secondary-teal-50));
+      border-radius: var(--radius-lg);
+      margin-bottom: var(--spacing-lg);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .word-image img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 0.3s ease;
+    }
+
+    .word-card:hover .word-image img {
+      transform: scale(1.05);
+    }
+
+    .placeholder-image {
+      font-size: 3.5rem;
+      color: var(--primary-blue-500);
+      opacity: 0.7;
+    }
+
+    .word-description {
+      flex: 1;
+      margin-bottom: var(--spacing-lg);
+    }
+
+    .word-description p {
+      color: var(--gray-600);
+      line-height: 1.6;
+      font-size: var(--font-size-sm);
+    }
+
+    .word-details {
+      background: var(--gray-50);
+      padding: var(--spacing-md);
+      border-radius: var(--radius-lg);
+      margin-bottom: var(--spacing-lg);
+      border: 1px solid var(--gray-200);
+    }
+
+    .detail-item {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: var(--spacing-xs);
+      font-size: var(--font-size-sm);
+    }
+
+    .detail-item:last-child {
+      margin-bottom: 0;
+    }
+
+    .detail-label {
+      color: var(--gray-600);
+      font-weight: 500;
+    }
+
+    .detail-value {
+      color: var(--gray-800);
+      font-weight: 600;
+    }
+
+    .word-actions {
+      display: flex;
+      gap: var(--spacing-sm);
+      margin-top: auto;
+    }
+
+    .action-btn {
+      flex: 1;
+      padding: var(--spacing-sm);
+      border-radius: var(--radius-md);
+      border: none;
+      background: var(--gray-100);
+      color: var(--gray-700);
+      font-size: var(--font-size-sm);
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: var(--spacing-xs);
+    }
+
+    .action-btn:hover {
+      background: var(--primary-blue-100);
+      color: var(--primary-blue-700);
+      transform: translateY(-2px);
+    }
+
+    .action-btn i {
+      font-size: 1rem;
+    }
+
+    .action-btn.primary {
+      background: linear-gradient(135deg, var(--primary-blue-500), var(--primary-blue-600));
+      color: white;
+    }
+
+    .action-btn.primary:hover {
+      background: linear-gradient(135deg, var(--primary-blue-600), var(--primary-blue-700));
+      box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+    }
+
+    .learning-section {
+      background: linear-gradient(135deg, var(--primary-blue-50), var(--secondary-teal-50));
+      border-radius: var(--radius-2xl);
+      padding: var(--spacing-2xl);
+      border: 1px solid var(--gray-200);
+      margin-bottom: var(--spacing-2xl);
+    }
+
+    .learning-progress {
+      margin-bottom: var(--spacing-xl);
+    }
+
+    .progress-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: var(--spacing-md);
+    }
+
+    .progress-label {
+      font-size: var(--font-size-lg);
+      font-weight: 700;
+      color: var(--gray-900);
+    }
+
+    .progress-value {
+      font-size: var(--font-size-2xl);
+      font-weight: 800;
+      color: var(--primary-blue-700);
+    }
+
+    .progress-bar {
+      height: 12px;
+      background: var(--gray-300);
+      border-radius: 6px;
+      overflow: hidden;
+      margin-bottom: var(--spacing-md);
+    }
+
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--primary-blue-500), var(--secondary-teal-500));
+      border-radius: 6px;
+      transition: width 0.5s ease;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .progress-fill::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: linear-gradient(90deg,
+      transparent,
+      rgba(255, 255, 255, 0.4),
+      transparent);
+      animation: shimmer 2s infinite;
+    }
+
+    .progress-stats {
+      display: flex;
+      justify-content: space-between;
+      font-size: var(--font-size-sm);
+      color: var(--gray-600);
+    }
+
+    .practice-words {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: var(--spacing-lg);
+    }
+
+    .practice-card {
+      background: white;
+      border-radius: var(--radius-lg);
+      padding: var(--spacing-lg);
+      text-align: center;
+      border: 2px solid var(--gray-200);
+      transition: all 0.3s ease;
+      cursor: pointer;
+    }
+
+    .practice-card:hover {
+      border-color: var(--primary-blue-400);
+      transform: translateY(-4px);
+      box-shadow: var(--shadow-md);
+    }
+
+    .practice-word {
+      font-size: var(--font-size-xl);
+      font-weight: 700;
+      color: var(--primary-blue-700);
+      margin-bottom: var(--spacing-sm);
+    }
+
+    .practice-difficulty {
+      font-size: var(--font-size-xs);
+      color: var(--gray-500);
+      margin-bottom: var(--spacing-md);
+    }
+
+    .practice-status {
+      padding: var(--spacing-xs) var(--spacing-md);
+      border-radius: var(--radius-full);
+      font-size: var(--font-size-xs);
+      font-weight: 600;
+    }
+
+    .status-new {
+      background: var(--warning-color);
+      color: white;
+    }
+
+    .status-learning {
+      background: var(--info-color);
+      color: white;
+    }
+
+    .status-mastered {
+      background: var(--success-color);
+      color: white;
+    }
+
+    .categories-section {
+      background: white;
+      border-radius: var(--radius-2xl);
+      padding: var(--spacing-2xl);
+      box-shadow: var(--shadow-lg);
+      border: 1px solid var(--gray-200);
+    }
+
+    .categories-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+      gap: var(--spacing-lg);
+      margin-top: var(--spacing-xl);
+    }
+
+    .category-card {
+      background: linear-gradient(135deg, var(--primary-blue-50), white);
+      border-radius: var(--radius-xl);
+      padding: var(--spacing-lg);
+      text-align: center;
+      border: 1px solid var(--gray-200);
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      cursor: pointer;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .category-card:hover {
+      transform: translateY(-6px) scale(1.05);
+      border-color: var(--primary-blue-400);
+      box-shadow: var(--shadow-lg);
+    }
+
+    .category-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 4px;
+      background: linear-gradient(90deg, var(--primary-blue-500), var(--secondary-teal-500));
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+
+    .category-card:hover::before {
+      opacity: 1;
+    }
+
+    .category-icon {
+      width: 60px;
+      height: 60px;
+      background: linear-gradient(135deg, var(--primary-blue-500), var(--secondary-teal-500));
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto var(--spacing-md);
+      font-size: 1.5rem;
+      color: white;
+      box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+    }
+
+    .category-name {
+      font-size: var(--font-size-base);
+      font-weight: 700;
+      color: var(--gray-900);
+      margin-bottom: var(--spacing-xs);
+    }
+
+    .category-count {
+      font-size: var(--font-size-sm);
+      color: var(--gray-600);
+      background: var(--gray-100);
+      padding: var(--spacing-xs) var(--spacing-sm);
+      border-radius: var(--radius-full);
+      display: inline-block;
+    }
+
+    .pagination {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: var(--spacing-sm);
+      margin-top: var(--spacing-2xl);
+    }
+
+    .pagination-btn {
+      width: 44px;
+      height: 44px;
+      border-radius: var(--radius-md);
+      border: 2px solid var(--gray-300);
+      background: white;
+      color: var(--gray-700);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      font-weight: 600;
+    }
+
+    .pagination-btn:hover {
+      border-color: var(--primary-blue-500);
+      color: var(--primary-blue-700);
+      transform: translateY(-2px);
+    }
+
+    .pagination-btn.active {
+      background: linear-gradient(135deg, var(--primary-blue-500), var(--primary-blue-600));
+      color: white;
+      border-color: var(--primary-blue-600);
+      box-shadow: 0 4px 12px rgba(59, 130, 246, 0.2);
+    }
+
+    .pagination-btn.disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .pagination-btn.disabled:hover {
+      transform: none;
+      border-color: var(--gray-300);
+      color: var(--gray-700);
+    }
+
+    @media (max-width: 768px) {
+      .words-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .search-bar {
+        flex-direction: column;
+      }
+
+      .practice-words {
+        grid-template-columns: 1fr;
+      }
+
+      .categories-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    @media (max-width: 480px) {
+      .categories-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .word-actions {
+        flex-direction: column;
+      }
+    }
+  </style>
+</head>
+<body class="dictionary-page">
+<!-- 背景装饰 -->
+<div class="background-deco"></div>
+
+<!-- 导航栏将通过JavaScript插入 -->
+
+<main class="main-content">
+  <div class="dictionary-container">
+    <!-- 词库标题 -->
+    <div class="dictionary-header">
+      <h1 class="section-title">医疗手语词库</h1>
+      <p class="section-subtitle">学习医疗场景常用手语词汇，提升医患沟通效率</p>
+      <div class="section-divider"></div>
+    </div>
+
+    <!-- 搜索区域 -->
+    <section class="search-section">
+      <div class="search-bar">
+        <div class="search-input">
+          <i class="fas fa-search"></i>
+          <input type="text" id="dictionarySearch" placeholder="搜索手语词汇，如：头痛、发热、咳嗽...">
+        </div>
+        <button class="btn btn-primary">
+          <i class="fas fa-search"></i>
+          搜索
+        </button>
+        <button class="btn btn-outline" id="voiceSearchBtn">
+          <i class="fas fa-microphone"></i>
+          语音搜索
+        </button>
+      </div>
+
+      <div class="search-filters">
+        <span class="filter-tag active" data-filter="all">全部词汇</span>
+        <span class="filter-tag" data-filter="symptom">症状描述</span>
+        <span class="filter-tag" data-filter="body">身体部位</span>
+        <span class="filter-tag" data-filter="action">医疗动作</span>
+        <span class="filter-tag" data-filter="treatment">治疗相关</span>
+        <span class="filter-tag" data-filter="emergency">紧急情况</span>
+        <span class="filter-tag" data-filter="medication">药物相关</span>
+      </div>
+
+      <div class="search-stats">
+        <span>共收录 <strong>532</strong> 个医疗手语词汇</span>
+        <span>您已学习 <strong>127</strong> 个词汇</span>
+      </div>
+    </section>
+
+    <!-- 学习进度 -->
+    <section class="learning-section">
+      <div class="learning-progress">
+        <div class="progress-header">
+          <div class="progress-label">您的学习进度</div>
+          <div class="progress-value">24%</div>
+        </div>
+        <div class="progress-bar">
+          <div class="progress-fill" style="width: 24%"></div>
+        </div>
+        <div class="progress-stats">
+          <span>已学习: 127个</span>
+          <span>待学习: 405个</span>
+          <span>已掌握: 89个</span>
+        </div>
+      </div>
+
+      <h3 class="section-header">
+        <i class="fas fa-lightbulb"></i>
+        今日推荐练习
+      </h3>
+
+      <div class="practice-words">
+        <div class="practice-card">
+          <div class="practice-word">头痛</div>
+          <div class="practice-difficulty">中等难度</div>
+          <div class="practice-status status-learning">学习中</div>
+        </div>
+        <div class="practice-card">
+          <div class="practice-word">发热</div>
+          <div class="practice-difficulty">初级难度</div>
+          <div class="practice-status status-mastered">已掌握</div>
+        </div>
+        <div class="practice-card">
+          <div class="practice-word">呼吸困难</div>
+          <div class="practice-difficulty">高级难度</div>
+          <div class="practice-status status-new">未学习</div>
+        </div>
+        <div class="practice-card">
+          <div class="practice-word">腹痛</div>
+          <div class="practice-difficulty">初级难度</div>
+          <div class="practice-status status-learning">学习中</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 词汇展示 -->
+    <section class="words-section">
+      <div class="section-header">
+        <h2>
+          <i class="fas fa-book-medical"></i>
+          常用医疗手语词汇
+        </h2>
+        <div class="btn-group">
+          <button class="btn btn-sm btn-outline" id="sortAlphabetically">
+            <i class="fas fa-sort-alpha-down"></i>
+            按字母排序
+          </button>
+          <button class="btn btn-sm btn-outline" id="sortByDifficulty">
+            <i class="fas fa-chart-line"></i>
+            按难度排序
+          </button>
+        </div>
+      </div>
+
+      <div class="words-grid" id="wordsGrid">
+        <!-- 词汇卡片将通过JavaScript动态生成 -->
+      </div>
+
+      <div class="pagination">
+        <button class="pagination-btn disabled">
+          <i class="fas fa-chevron-left"></i>
+        </button>
+        <button class="pagination-btn active">1</button>
+        <button class="pagination-btn">2</button>
+        <button class="pagination-btn">3</button>
+        <button class="pagination-btn">4</button>
+        <button class="pagination-btn">5</button>
+        <button class="pagination-btn">
+          <i class="fas fa-chevron-right"></i>
+        </button>
+      </div>
+    </section>
+
+    <!-- 分类浏览 -->
+    <section class="categories-section">
+      <div class="section-header">
+        <h2>
+          <i class="fas fa-folder"></i>
+          按分类浏览
+        </h2>
+        <button class="btn btn-text" id="viewAllCategories">
+          查看全部分类
+          <i class="fas fa-arrow-right"></i>
+        </button>
+      </div>
+
+      <div class="categories-grid">
+        <div class="category-card" data-category="symptom">
+          <div class="category-icon">
+            <i class="fas fa-head-side-cough"></i>
+          </div>
+          <div class="category-name">症状描述</div>
+          <div class="category-count">168个词汇</div>
+        </div>
+        <div class="category-card" data-category="body">
+          <div class="category-icon">
+            <i class="fas fa-user-md"></i>
+          </div>
+          <div class="category-name">身体部位</div>
+          <div class="category-count">89个词汇</div>
+        </div>
+        <div class="category-card" data-category="treatment">
+          <div class="category-icon">
+            <i class="fas fa-stethoscope"></i>
+          </div>
+          <div class="category-name">治疗相关</div>
+          <div class="category-count">75个词汇</div>
+        </div>
+        <div class="category-card" data-category="medication">
+          <div class="category-icon">
+            <i class="fas fa-pills"></i>
+          </div>
+          <div class="category-name">药物相关</div>
+          <div class="category-count">62个词汇</div>
+        </div>
+        <div class="category-card" data-category="emergency">
+          <div class="category-icon">
+            <i class="fas fa-ambulance"></i>
+          </div>
+          <div class="category-name">紧急情况</div>
+          <div class="category-count">48个词汇</div>
+        </div>
+        <div class="category-card" data-category="action">
+          <div class="category-icon">
+            <i class="fas fa-procedures"></i>
+          </div>
+          <div class="category-name">医疗动作</div>
+          <div class="category-count">90个词汇</div>
+        </div>
+      </div>
+    </section>
+  </div>
+</main>
+
+<!-- 页脚将通过JavaScript插入 -->
+
+<script type="module" src="script.js"></script>
+<script type="module" src="dictionary-script.js"></script>
+</body>
+</html>

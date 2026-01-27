@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>手语诊断 - 手语医疗助手</title>
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;600;700;800&display=swap">
+  <link rel="icon" href="img/favicon.ico" type="image/x-icon">
+</head>
+<body class="diagnosis-page">
+<!-- 背景装饰 -->
+<div class="background-deco"></div>
+
+<!-- 导航栏将通过JavaScript插入 -->
+
+<main class="main-content">
+  <div class="diagnosis-container">
+    <!-- 左侧区域 -->
+    <div class="diagnosis-left">
+      <!-- 摄像头区域 -->
+      <section class="camera-section">
+        <div class="section-header">
+          <h2>
+            <i class="fas fa-video"></i>
+            手语识别摄像头
+          </h2>
+          <button class="btn-help" data-tooltip="请确保手部在识别框内，光线充足">
+            <i class="fas fa-question-circle"></i>
+          </button>
+        </div>
+
+        <div class="camera-container">
+          <div class="camera-preview">
+            <div class="camera-frame" id="cameraFrame">
+              <video id="cameraFeed" autoplay muted playsinline></video>
+              <div class="camera-overlay">
+                <div class="hand-guide">
+                  <div class="hand-outline"></div>
+                </div>
+                <div class="guide-text">
+                  <i class="fas fa-hand-paper"></i>
+                  请将手部放置在识别框内
+                </div>
+              </div>
+              <div class="recording-indicator">
+                <div class="recording-dot"></div>
+                识别中...
+              </div>
+            </div>
+          </div>
+
+          <div class="camera-quality">
+            <div class="quality-item">
+              <i class="fas fa-check-circle"></i>
+              摄像头就绪
+            </div>
+            <div class="quality-item">
+              <i class="fas fa-lightbulb"></i>
+              光线充足
+            </div>
+            <div class="quality-item">
+              <i class="fas fa-hand-paper"></i>
+              手部检测
+            </div>
+          </div>
+        </div>
+
+        <div class="camera-controls">
+          <button class="btn btn-success" id="startRecognition">
+            <i class="fas fa-play"></i>
+            开始识别
+          </button>
+          <button class="btn btn-danger" id="stopRecognition" disabled>
+            <i class="fas fa-stop"></i>
+            停止识别
+          </button>
+          <button class="btn btn-outline" id="captureImage">
+            <i class="fas fa-camera"></i>
+            拍摄
+          </button>
+          <button class="btn btn-text" id="toggleCamera">
+            <i class="fas fa-sync-alt"></i>
+            切换摄像头
+          </button>
+        </div>
+
+        <div class="recognition-stats">
+          <div class="stat-card">
+            <div class="stat-value" id="recognitionCount">0</div>
+            <div class="stat-label">今日识别次数</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-value" id="successRate">0%</div>
+            <div class="stat-label">识别成功率</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 历史记录 -->
+      <section class="history-section">
+        <div class="section-header">
+          <h2>
+            <i class="fas fa-history"></i>
+            识别历史
+          </h2>
+          <button class="btn-clear-history" id="clearHistory" data-tooltip="清空历史记录">
+            <i class="fas fa-trash"></i>
+          </button>
+        </div>
+
+        <div class="history-list" id="historyList">
+          <!-- 历史记录将通过JavaScript动态添加 -->
+          <div class="empty-state">
+            <i class="fas fa-history"></i>
+            <h4>暂无识别记录</h4>
+            <p>开始手语识别后，历史记录将在这里显示</p>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <!-- 右侧区域 -->
+    <div class="diagnosis-right">
+      <!-- 识别结果 -->
+      <section class="results-section">
+        <div class="section-header">
+          <h2>
+            <i class="fas fa-list-alt"></i>
+            识别结果
+          </h2>
+          <div class="result-actions">
+            <button class="btn btn-sm btn-text" id="clearResults">
+              <i class="fas fa-trash"></i>
+              清空
+            </button>
+          </div>
+        </div>
+
+        <div class="results-container">
+          <div class="results-display compact-results" id="resultsDisplay">
+            <div class="empty-state">
+              <i class="fas fa-comments"></i>
+              <h4>等待识别结果</h4>
+              <p>请开始手语识别，结果将实时显示在这里</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 诊断引导 -->
+      <section class="guidance-section">
+        <div class="section-header">
+          <h2>
+            <i class="fas fa-comment-medical"></i>
+            诊断引导
+          </h2>
+          <div class="guidance-progress">
+            <i class="fas fa-sign-language"></i>
+            问题 1/4
+          </div>
+        </div>
+
+        <div class="guidance-content">
+          <div class="guidance-question">
+            <div class="question-text">
+              <div class="question-number">1</div>
+              <div class="question-content">
+                您哪里感到不适？（请用手语表示身体部位）
+              </div>
+            </div>
+            <div class="question-hint">
+              <i class="fas fa-lightbulb"></i>
+              例如：头部、胸部、腹部、四肢等
+            </div>
+          </div>
+
+          <div class="guidance-options">
+            <div class="options-title">常见选项</div>
+            <div class="options-grid">
+              <!-- 选项将通过JavaScript动态添加 -->
+            </div>
+          </div>
+
+          <div class="custom-input-section">
+            <button class="btn btn-outline btn-custom-input" id="customInputBtn">
+              <i class="fas fa-edit"></i>
+              自定义输入
+            </button>
+          </div>
+        </div>
+
+        <!-- 自定义输入模态框 -->
+        <div class="modal-overlay" id="customInputModal">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h3>
+                <i class="fas fa-edit"></i>
+                自定义输入
+              </h3>
+              <button class="modal-close" id="closeModal">
+                <i class="fas fa-times"></i>
+              </button>
+            </div>
+
+            <div class="modal-body">
+              <div class="input-group">
+                <label for="customInputValue" id="customInputLabel">
+                  请输入您的症状描述：
+                </label>
+                <textarea
+                  id="customInputValue"
+                  placeholder="请详细描述您的症状..."
+                  rows="4"
+                ></textarea>
+                <div class="input-hint" id="customInputHint">
+                  请尽可能详细地描述您的症状
+                </div>
+              </div>
+
+              <div class="example-answers" id="exampleAnswers">
+                <div class="example-title">示例：</div>
+                <div class="example-items">
+                  <div class="example-item">持续性剧烈头痛</div>
+                  <div class="example-item">腹部阵发性疼痛</div>
+                  <div class="example-item">低热伴随咳嗽</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="modal-footer">
+              <button class="btn btn-text" id="cancelCustomInput">
+                取消
+              </button>
+              <button class="btn btn-primary" id="submitCustomInput">
+                确认输入
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div class="guidance-controls">
+          <button class="btn btn-text" id="prevQuestion" disabled>
+            <i class="fas fa-chevron-left"></i>
+            上一问题
+          </button>
+          <button class="btn btn-primary" id="nextQuestion">
+            下一问题
+            <i class="fas fa-chevron-right"></i>
+          </button>
+        </div>
+      </section>
+
+      <!-- 就医辅助卡 -->
+      <section class="card-section">
+        <div class="section-header">
+          <h2>
+            <i class="fas fa-file-medical"></i>
+            就医辅助卡
+          </h2>
+          <div class="card-status">
+            <span class="status-badge incomplete">未完成</span>
+          </div>
+        </div>
+
+        <div class="card-preview">
+          <div class="card-header">
+            <div class="card-title">就医辅助卡</div>
+            <div class="card-date" id="cardDate">2024-01-15</div>
+          </div>
+
+          <div class="card-content wide-card" id="cardContent">
+            <div class="card-row">
+              <div class="card-label">主要症状：</div>
+              <div class="card-value" id="symptomValue">待填写</div>
+            </div>
+            <div class="card-row">
+              <div class="card-label">持续时间：</div>
+              <div class="card-value" id="durationValue">待填写</div>
+            </div>
+            <div class="card-row">
+              <div class="card-label">疼痛程度：</div>
+              <div class="card-value" id="painLevelValue">待填写</div>
+            </div>
+            <div class="card-row">
+              <div class="card-label">其他症状：</div>
+              <div class="card-value" id="otherSymptomsValue">待填写</div>
+            </div>
+            <div class="card-row department-recommendation-row">
+              <div class="card-label">初步推荐科室：</div>
+              <div class="card-value" id="departmentRecommendationValue">分析中...</div>
+            </div>
+            <div class="card-row">
+              <div class="card-label">医生诊断：</div>
+              <div class="card-value">
+                <input type="text" class="card-input" id="doctorDiagnosis" placeholder="医生填写诊断结果">
+              </div>
+            </div>
+            <div class="card-row">
+              <div class="card-label">建议用药：</div>
+              <div class="card-value">
+                <input type="text" class="card-input" id="doctorMedication" placeholder="医生填写用药建议">
+              </div>
+            </div>
+            <div class="card-row">
+              <div class="card-label">医生签名：</div>
+              <div class="card-value">
+                <input type="text" class="card-input" id="doctorSignature" placeholder="医生签名">
+              </div>
+            </div>
+          </div>
+
+          <div class="card-actions">
+            <div class="card-options">
+              <button class="btn-option" data-tooltip="打印卡片">
+                <i class="fas fa-print"></i>
+              </button>
+              <button class="btn-option" data-tooltip="保存为图片">
+                <i class="fas fa-download"></i>
+              </button>
+              <button class="btn-option" data-tooltip="分享">
+                <i class="fas fa-share-alt"></i>
+              </button>
+            </div>
+            <button class="btn btn-primary btn-block" id="generateCard" disabled>
+              <i class="fas fa-file-medical-alt"></i>
+              生成完整就医卡片
+            </button>
+          </div>
+        </div>
+      </section>
+    </div>
+  </div>
+</main>
+
+<!-- 页脚将通过JavaScript插入 -->
+
+<script type="module" src="script.js"></script>
+<script type="module" src="diagnosis-script.js"></script>
+</body>
+</html>
