@@ -1,283 +1,408 @@
-# 手语识别系统运行说明
+# 手语医疗助手
 
-## 系统架构
+## 📋 项目概述
 
-- **后端**: Python Flask API服务器（在PyCharm中运行）
-- **前端**: Web前端应用（在IDEA中运行）
+**手语医疗助手**是一个专为听障人士设计的智能医疗辅助系统，通过实时手语识别技术，帮助听障患者与医生建立无障碍沟通渠道，提供精准的医疗诊断支持。
 
-## 一、后端运行步骤（PyCharm）
+### 核心价值
+- 🏥 **消除沟通障碍**：实现听障患者与医生之间的顺畅沟通
+- 🤖 **智能诊断支持**：基于AI手语识别生成标准化医疗报告
+- 📚 **教育资源**：内置医疗手语词库，支持学习和练习
+- 📊 **数据分析**：提供历史记录分析与使用洞察
 
-### 1. 环境准备
+## 🗂️ 项目结构
 
-1. 打开PyCharm，打开项目目录：`C:\pyproject\PythonProject1`
+```
+med_sigh_rec/                  # 项目根目录
+├── .git/                     # Git版本控制目录
+├── node_modules/             # Node.js依赖包
+├── .idea/                    # IDE配置文件目录（可考虑.gitignore）
+├── components/               # 可复用组件
+│   ├── footer.js
+│   └── header.js
+├── css/                      # 样式文件
+│   └── style.css
+├── img/                      # 图片资源
+├── js/                       # JavaScript文件
+│   ├── api_service.js        # API服务
+│   ├── app.js               # 主应用入口
+├── diagnosis-script.js  # 诊断页面逻辑
+├── dictionary-script.js # 词库页面逻辑
+├── history-script.js    # 历史记录逻辑
+├── script.js            # 通用脚本
+├── diagnosis.html
+├── dictionary.html
+├── history.html
+├── index.html
 
-2. 安装Python依赖：
+```
+
+## 🚀 核心功能模块
+
+### 1. **实时手语识别系统**
+- **技术栈**：MediaPipe手部检测 + MobileNetV2深度学习模型
+- **功能特点**：
+  - 摄像头实时捕捉手部动作
+  - 高精度手语词汇识别
+  - 置信度显示与错误报告机制
+  - 多摄像头支持与切换
+
+### 2. **智能诊断引导**
+- **交互流程**：
+  1. 身体部位识别
+  2. 症状持续时间询问
+  3. 疼痛程度评估
+  4. 伴随症状收集
+- **特色功能**：
+  - 预定义选项 + 自定义输入
+  - 智能科室推荐算法
+  - 实时就医辅助卡生成
+
+### 3. **医疗手语词库**
+- **词汇分类**：
+  - 症状描述（168个词汇）
+  - 身体部位（89个词汇）
+  - 治疗相关（75个词汇）
+  - 药物相关（62个词汇）
+  - 紧急情况（48个词汇）
+- **学习功能**：
+  - 分类浏览与搜索
+  - 学习进度跟踪
+  - 难度分级练习
+
+### 4. **数据管理与分析**
+- **历史记录**：
+  - 识别记录存储与检索
+  - 多维筛选与搜索
+  - 数据导出功能（JSON/CSV/PDF）
+- **统计分析**：
+  - 使用趋势图表（Chart.js）
+  - 准确率分析
+  - 个性化使用洞察
+
+## 🛠️ 技术架构
+
+### 前端技术栈
+- **基础框架**：纯HTML5 + CSS3 + JavaScript
+- **响应式设计**：移动端优先，自适应布局
+- **图表库**：Chart.js 4.4.0
+- **图标库**：Font Awesome 6.4.0
+- **字体**：Google Noto Sans SC（支持中文）
+
+### 后端API接口
+```javascript
+// API服务端点
+- GET    /api/health     # 健康检查
+- POST   /api/recognize  # 手语识别
+- GET    /api/history    # 获取历史记录
+```
+
+### 数据存储
+- **本地存储**：使用LocalStorage保存用户数据
+- **数据类型**：
+  - 诊断历史记录
+  - 学习进度
+  - 用户偏好设置
+
+## 🔧 快速开始
+
+### 环境要求
+- 现代浏览器（Chrome 90+ / Firefox 88+ / Safari 14+）
+- 摄像头权限
+- 后端服务运行（可选，支持模拟数据）
+
+### 本地部署
+1. **克隆项目**
    ```bash
+   git clone https://github.com/yourusername/sign-language-medical-assistant.git
+   ```
+
+2. **安装依赖**
+  - 前端依赖已通过CDN加载，无需额外安装
+  - 如需后端服务，需要运行Python Flask服务器
+
+3. **启动服务**
+   ```bash
+   # 仅前端（使用模拟数据）
+   # 直接打开index.html文件
+
+   # 完整前后端
+   # 1. 启动后端服务（假设Python环境已配置）
+   cd backend
    pip install -r requirements.txt
-   ```
-   
-   主要依赖包括：
-   - flask
-   - flask-cors
-   - torch
-   - torchvision
-   - opencv-python
-   - mediapipe
-   - numpy
-   - Pillow
+   python app.py
 
-### 2. 检查模型文件
-
-确保模型文件存在：
-- `data/weights/sign_18_mobilenet_final.pth`
-
-### 3. 运行后端服务器
-
-**方法一：使用启动脚本（推荐）**
-1. 在PyCharm中打开 `run_api_server.py` 文件
-2. 右键点击文件，选择 "Run 'run_api_server'"
-   或者直接运行：
-   ```bash
-   python run_api_server.py
+   # 2. 浏览器访问
+   http://localhost:5000
    ```
 
-**方法二：直接运行API服务**
-1. 在PyCharm中打开 `app/api_server.py` 文件
-2. 右键点击文件，选择 "Run 'api_server'"
-   或者直接运行：
-   ```bash
-   python app/api_server.py
-   ```
+## 📱 页面功能详解
 
-3. 看到以下输出表示启动成功：
-   ```
-   ============================================================
-   手语识别API服务启动中...
-   模型路径: data/weights/sign_18_mobilenet_final.pth
-   使用设备: cpu (或 cuda)
-   ============================================================
-   
-   API端点:
-     - GET  /api/health    - 健康检查
-     - POST /api/recognize - 手语识别
-     - GET  /api/history   - 历史记录
-   
-   服务将在 http://localhost:5000 启动
-   ============================================================
-   ```
+### 首页 (`index.html`)
+- 项目介绍与愿景展示
+- 核心功能概览
+- 使用流程引导
+- 统计数据显示
 
-4. 后端API将在 `http://localhost:5000` 上运行
+### 诊断页面 (`diagnosis.html`)
+- **摄像头模块**：实时手语识别
+- **诊断引导**：四步问答流程
+- **就医辅助卡**：自动生成标准化医疗卡片
+- **历史记录**：识别结果追踪
 
-### 4. 验证后端服务
+### 词库页面 (`dictionary.html`)
+- **词汇浏览**：分类筛选与搜索
+- **学习系统**：进度跟踪与练习
+- **词汇详情**：图片展示与发音标注
+- **分类管理**：按医疗场景组织
 
-在浏览器中访问：`http://localhost:5000/api/health`
+### 历史页面 (`history.html`)
+- **数据可视化**：识别趋势图表
+- **统计分析**：准确率与使用习惯
+- **数据导出**：多格式支持
+- **智能洞察**：个性化建议
 
-应该看到JSON响应：
+## 🎯 关键算法
+
+### 1. **科室推荐算法**
+```javascript
+function recommendDepartment(symptoms) {
+  const departmentRules = {
+    "神经内科": { keywords: ["头", "脖子"] },
+    "心血管内科": { keywords: ["心脏"] },
+    "消化内科": { keywords: ["恶心"] },
+    // ... 其他科室规则
+  };
+
+  // 基于症状关键词匹配推荐
+  return analysisResult;
+}
+```
+
+### 2. **准确率计算**
+- **计算公式**：正确识别次数 / 总识别次数 × 100%
+- **错误标记**：用户可手动标记错误识别
+- **趋势分析**：日/周/月对比
+
+### 3. **学习进度算法**
+- **掌握程度**：未学习 → 学习中 → 已掌握
+- **难度分级**：初级/中级/高级
+- **个性化推荐**：基于薄弱环节推荐练习
+
+## 📊 数据模型
+
+### 识别记录结构
 ```json
 {
-  "status": "ok",
-  "service": "手语识别API",
-  "model_loaded": true,
-  "device": "cpu"
+  "id": "record_20250115_123456",
+  "text": "头痛",
+  "timestamp": "2025-01-15T10:30:00Z",
+  "isError": false,
+  "confidence": 0.92,
+  "category": "symptom"
 }
 ```
 
-## 二、前端运行步骤（IDEA）
+### 学习进度结构
+```json
+{
+  "learned": [1, 3, 5, 7],
+  "mastered": [3, 7],
+  "progress": 24
+}
+```
 
-### 1. 环境准备
+### 诊断答案结构
+```json
+{
+  "question1": "头",
+  "question1_custom": false,
+  "question2": "几小时",
+  // ... 其他问题答案
+}
+```
 
-1. 打开IDEA，打开项目目录：`C:\Users\陈子涵\IdeaProjects\med_sigh_rec`
+## 🔍 高级功能
 
-2. 确保已安装Node.js（建议版本 14+）
+### 1. **实时错误报告**
+- 用户可标记错误识别结果
+- 用于改进算法准确率
+- 影响成功率计算
 
-3. 安装前端依赖：
-   ```bash
-   npm install
-   ```
+### 2. **自定义输入支持**
+- 预定义选项不能满足时的补充
+- 支持示例参考
+- 保持结构化数据
 
-### 2. 配置后端地址（如需要）
+### 3. **医生协作功能**
+- 医生可填写诊断结果
+- 用药建议记录
+- 电子签名支持
 
-如果后端运行在不同的地址或端口，修改 `js/api_service.js` 文件：
+### 4. **数据导出**
+- **格式支持**：JSON, CSV, PDF, Excel
+- **筛选导出**：按时间/类型/置信度
+- **批量操作**：全选/批量删除
 
+## 🎨 设计特色
+
+### UI/UX设计原则
+- **无障碍设计**：高对比度，大字体，清晰布局
+- **直观交互**：最小学习成本，符合医疗场景
+- **响应式布局**：适配桌面、平板、手机
+- **视觉反馈**：丰富的动画和状态提示
+
+### 配色方案
+- **主色调**：蓝色（#3b82f6）- 代表医疗与科技
+- **辅助色**：青色（#0d9488）- 代表健康与沟通
+- **强调色**：绿色（#10b981）- 成功状态
+- **警示色**：红色（#ef4444）- 错误状态
+
+### 动效设计
+- **微交互**：按钮悬停、卡片浮动
+- **加载状态**：骨架屏、进度指示器
+- **页面过渡**：平滑的页面切换
+
+## 🔒 安全与隐私
+
+### 数据保护
+- **本地存储**：敏感数据不发送到服务器
+- **摄像头权限**：显式请求，可随时关闭
+- **隐私政策**：明确的数据使用说明
+
+### 访问控制
+- **无需登录**：降低使用门槛
+- **数据隔离**：基于浏览器会话
+- **清理选项**：一键清空历史记录
+
+## 📈 性能优化
+
+### 前端优化
+- **懒加载**：图片和组件按需加载
+- **缓存策略**：LocalStorage智能缓存
+- **代码分割**：按页面拆分JavaScript
+
+### 网络优化
+- **CDN资源**：图标、字体、图表库
+- **请求合并**：减少API调用次数
+- **离线支持**：基础功能本地运行
+
+## 🧪 测试与验证
+
+### 功能测试清单
+- [ ] 摄像头访问与切换
+- [ ] 手语识别流程
+- [ ] 诊断问答系统
+- [ ] 就医卡生成与导出
+- [ ] 词库搜索与学习
+- [ ] 历史记录筛选与分析
+- [ ] 数据导入导出
+- [ ] 响应式布局适配
+
+### 兼容性测试
+- **浏览器**：Chrome, Firefox, Safari, Edge
+- **设备**：桌面电脑，平板，手机
+- **分辨率**：1080p, 2K, 4K, 移动端各种尺寸
+
+## 📚 开发指南
+
+### 代码规范
+- **JavaScript**：ES6+语法，模块化组织
+- **CSS**：BEM命名规范，CSS变量
+- **HTML**：语义化标签，ARIA属性
+
+### 组件开发
 ```javascript
-constructor(baseURL = 'http://localhost:5000') {
-  this.baseURL = baseURL;
+// 组件示例：可复用的功能模块
+export class FeatureComponent {
+  constructor(config) {
+    this.config = config;
+    this.init();
+  }
+
+  init() {
+    // 初始化逻辑
+  }
+
+  render() {
+    // 渲染逻辑
+  }
 }
 ```
 
-### 3. 运行前端开发服务器
+### API集成
+```javascript
+// API调用示例
+const api = new SignLanguageAPI('http://localhost:5000');
 
-在IDEA的终端中运行：
-```bash
-npm start
+api.recognize(imageData)
+  .then(result => {
+    // 处理识别结果
+  })
+  .catch(error => {
+    // 错误处理
+  });
 ```
 
-或者使用webpack命令：
-```bash
-npx webpack serve --open --config webpack.config.dev.js
-```
+## 🤝 贡献指南
 
-### 4. 访问前端应用
+### 开发流程
+1. Fork项目仓库
+2. 创建特性分支 (`git checkout -b feature/AmazingFeature`)
+3. 提交更改 (`git commit -m 'Add some AmazingFeature'`)
+4. 推送到分支 (`git push origin feature/AmazingFeature`)
+5. 开启Pull Request
 
-前端应用将在浏览器中自动打开，通常是：`http://localhost:8080`
+### 提交规范
+- **feat**: 新功能
+- **fix**: 错误修复
+- **docs**: 文档更新
+- **style**: 代码格式调整
+- **refactor**: 代码重构
+- **test**: 测试相关
+- **chore**: 构建过程或辅助工具的变动
 
-如果没有自动打开，手动访问：
-- `http://localhost:8080/index.html` - 首页
-- `http://localhost:8080/diagnosis.html` - 手语识别诊断页面
+## 🚨 故障排除
 
-## 三、使用流程
+### 常见问题
 
-### 1. 启动顺序
+#### Q: 摄像头无法访问
+**A**:
+1. 检查浏览器摄像头权限
+2. 确保没有其他程序占用摄像头
+3. 尝试切换前后摄像头
 
-**重要**: 必须先启动后端，再启动前端！
+#### Q: 手语识别不准确
+**A**:
+1. 确保光线充足
+2. 手部完全在识别框内
+3. 使用标准手语动作
+4. 标记错误结果帮助系统学习
 
-1. ✅ 首先在PyCharm中启动后端（`run_api_server.py` 或 `app/api_server.py`）
-2. ✅ 然后在IDEA中启动前端（`npm start`）
+#### Q: 页面加载缓慢
+**A**:
+1. 检查网络连接
+2. 清理浏览器缓存
+3. 禁用不必要的浏览器扩展
 
-### 2. 使用手语识别功能
+#### Q: 数据丢失
+**A**:
+1. 定期导出重要数据
+2. 避免使用隐私浏览模式
+3. 不要清除浏览器本地存储
 
-1. 打开前端应用，进入"手语诊断"页面（`diagnosis.html`）
-2. 允许浏览器访问摄像头权限
-3. 点击"开始识别"按钮
-4. 将手部放在摄像头前，做出手语动作
-5. 系统会每2秒自动识别一次，结果显示在右侧
+### 联系渠道
+2185594696@qq.com
 
-### 3. 识别结果说明
+## 📄 许可证
 
-- **识别结果**: 显示识别出的手语类别（如：ABDOMEN, ARM, COLD, COUGH, EIGHT, FEVER, FIVE, FOUR, HEAD, HEART, NAUSEA, NINE, ONE, SEVEN, SIX, TEN, THREE, TWO）
-- **置信度**: 显示识别的置信度（0-100%）
-- **历史记录**: 自动保存识别历史
+本项目采用 MIT 许可证 - 查看 [LICENSE](LICENSE) 文件了解详情
 
-## 四、常见问题
+## 🙏 致谢
 
-### 1. 后端无法启动
-
-**问题**: 提示找不到模型文件
-- **解决**: 检查 `data/weights/sign_18_mobilenet_final.pth` 文件是否存在
-
-**问题**: 端口5000被占用
-- **解决**: 修改 `app/api_server.py` 或 `run_api_server.py` 最后一行的端口号：
-  ```python
-  app.run(host='0.0.0.0', port=5001, debug=False)  # 改为5001或其他端口
-  ```
-  同时修改前端的 `js/api_service.js` 中的端口号：
-  ```javascript
-  constructor(baseURL = 'http://localhost:5001') {
-    this.baseURL = baseURL;
-  }
-  ```
-
-### 2. 前端无法连接后端
-
-**问题**: 前端显示"无法连接到后端服务"
-- **解决**: 
-  1. 确认后端已启动并运行在 `http://localhost:5000`
-  2. 在浏览器中访问 `http://localhost:5000/api/health` 验证后端是否正常
-  3. 检查防火墙是否阻止了连接
-  4. 确认后端和前端在同一台机器上，或修改CORS配置
-
-### 3. 摄像头无法访问
-
-**问题**: 浏览器提示无法访问摄像头
-- **解决**:
-  1. 检查浏览器权限设置，允许访问摄像头
-  2. 确保没有其他应用占用摄像头
-  3. 尝试使用HTTPS（某些浏览器要求HTTPS才能访问摄像头）
-
-### 4. 识别结果不准确
-
-**问题**: 识别结果错误或无法识别
-- **解决**:
-  1. 确保手部在摄像头视野中央
-  2. 确保光线充足
-  3. 手部动作清晰，符合ASL手语标准
-  4. 等待2秒让系统完成识别
-
-## 五、API接口说明
-
-### 1. 健康检查
-- **URL**: `GET /api/health`
-- **返回**: 服务状态信息
-
-### 2. 手语识别
-- **URL**: `POST /api/recognize`
-- **请求体**:
-  ```json
-  {
-    "image": "data:image/jpeg;base64,...",
-    "timestamp": "2024-01-01T12:00:00"
-  }
-  ```
-- **返回**:
-  ```json
-  {
-    "success": true,
-    "result": "HEAD",
-    "confidence": 0.95
-  }
-  ```
-  或失败时：
-  ```json
-  {
-    "success": false,
-    "error": "未检测到手部，请将手放在摄像头前"
-  }
-  ```
-
-### 3. 历史记录
-- **URL**: `GET /api/history`
-- **返回**: 历史记录列表
-
-## 六、项目结构
-
-### 后端结构
-```
-PythonProject1/
-├── run_api_server.py      # API服务启动脚本（推荐使用）
-├── app/
-│   ├── api_server.py      # Flask API服务器主文件
-│   ├── frame.py           # Tkinter GUI应用（原桌面应用）
-│   └── frame_utils.py     # 手部特征提取工具
-├── model/
-│   ├── cnn_models.py      # 深度学习模型
-│   └── attention_layers.py # 注意力层
-├── utils/
-│   ├── label_mapper.py    # 标签映射工具
-│   └── model_checkpoint.py # 模型加载工具
-├── data/
-│   └── weights/           # 模型权重文件
-│       └── sign_18_mobilenet_final.pth
-└── requirements.txt       # Python依赖
-```
-
-### 前端结构
-```
-med_sigh_rec/
-├── index.html            # 首页
-├── diagnosis.html        # 诊断页面
-├── js/
-│   ├── api_service.js   # API服务封装
-│   └── app.js           # 主应用文件
-├── diagnosis-script.js   # 诊断页面脚本
-├── script.js            # 通用脚本
-└── package.json         # Node.js依赖
-```
-
-## 七、开发建议
-
-1. **后端开发**: 在PyCharm中修改 `app/api_server.py` 后，需要重启服务（建议使用debug模式：将 `debug=False` 改为 `debug=True`）
-2. **前端开发**: 修改前端代码后，webpack会自动重新编译
-3. **调试**: 使用浏览器开发者工具（F12）查看控制台日志
-4. **测试**: 先测试后端API是否正常，再测试前端连接
-
-## 八、注意事项
-
-1. ⚠️ 确保后端和前端在同一台机器上，或正确配置CORS
-2. ⚠️ 摄像头权限需要在浏览器中手动授权
-3. ⚠️ 识别功能需要稳定的网络连接（如果前后端分离部署）
-4. ⚠️ 模型文件较大，首次加载可能需要一些时间
-
----
-
-**祝使用愉快！如有问题，请检查控制台日志和浏览器开发者工具。**
+### 技术依赖
+- [MediaPipe](https://mediapipe.dev/) - 手部检测
+- [Chart.js](https://www.chartjs.org/) - 数据可视化
+- [Font Awesome](https://fontawesome.com/) - 图标库
+- [Google Fonts](https://fonts.google.com/) - 字体服务
 
