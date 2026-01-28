@@ -26,10 +26,10 @@ med_sigh_rec/                  # 项目根目录
 ├── js/                       # JavaScript文件
 │   ├── api_service.js        # API服务
 │   ├── app.js               # 主应用入口
-├── diagnosis-script.js  # 诊断页面逻辑
-├── dictionary-script.js # 词库页面逻辑
-├── history-script.js    # 历史记录逻辑
-├── script.js            # 通用脚本
+│   ├── diagnosis-script.js  # 诊断页面逻辑
+│   ├── dictionary-script.js # 词库页面逻辑
+│   ├── history-script.js    # 历史记录逻辑
+│   └── script.js            # 通用脚本
 ├── diagnosis.html
 ├── dictionary.html
 ├── history.html
@@ -92,9 +92,9 @@ med_sigh_rec/                  # 项目根目录
 ### 后端API接口
 ```javascript
 // API服务端点
-- GET    /api/health     # 健康检查
-- POST   /api/recognize  # 手语识别
-- GET    /api/history    # 获取历史记录
+- GET    /api/health
+- POST   /api/recognize
+- GET    /api/history
 ```
 
 ### 数据存储
@@ -217,8 +217,7 @@ function recommendDepartment(symptoms) {
 {
   "question1": "头",
   "question1_custom": false,
-  "question2": "几小时",
-  // ... 其他问题答案
+  "question2": "几小时"
 }
 ```
 
