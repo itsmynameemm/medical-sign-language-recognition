@@ -1,6 +1,6 @@
 // script.js - 主脚本文件
-import { createHeader, initHeader } from './components/header.js';
-import { createFooter, initFooter } from './components/footer.js';
+import { createHeader, initHeader } from '../components/header.js';
+import { createFooter, initFooter } from '../components/footer.js';
 
 // 全局初始化
 document.addEventListener('DOMContentLoaded', function() {
@@ -354,7 +354,7 @@ async function checkBackendConnection() {
 
   try {
     // 动态导入API服务
-    const { signLanguageAPI } = await import('./js/api_service.js');
+    const { signLanguageAPI } = await import('./api_service.js');
     const health = await signLanguageAPI.checkHealth();
 
     if (health.status === 'ok') {
@@ -388,20 +388,20 @@ function updateHomePageAccuracy() {
     if (!stored) {
       return; // 没有历史记录，保持默认值
     }
-    
+
     const history = JSON.parse(stored);
     if (history.length === 0) {
       return; // 历史记录为空，保持默认值
     }
-    
+
     // 计算准确率：未标记为错误的记录占比
     const correctCount = history.filter(item => !item.isError).length;
     const accuracy = Math.round((correctCount / history.length) * 100);
-    
+
     // 更新准确率显示
     const confidenceFill = document.querySelector('.confidence-fill');
     const confidenceText = document.querySelector('.result-confidence span:last-child');
-    
+
     if (confidenceFill) {
       confidenceFill.style.width = `${accuracy}%`;
     }

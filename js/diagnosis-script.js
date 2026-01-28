@@ -1,6 +1,6 @@
 // diagnosis-script.js - 诊断页面专用脚本
 import { showMessage, showLoading, hideLoading } from './script.js';
-import { signLanguageAPI } from './js/api_service.js';
+import { signLanguageAPI } from './api_service.js';
 
 class DiagnosisApp {
   constructor() {
@@ -24,11 +24,11 @@ class DiagnosisApp {
 
     // 初始化摄像头
     this.initCameraStream();
-    
+
     // 检查后端连接
     this.checkBackendConnection();
   }
-  
+
   async checkBackendConnection() {
     try {
       const health = await signLanguageAPI.checkHealth();
@@ -160,13 +160,13 @@ class DiagnosisApp {
         this.selectExample(exampleItem.textContent.trim());
         return;
       }
-      
+
       // 只关闭模态框本身，不关闭内容区域
       if (e.target === modal) {
         this.closeCustomInput();
       }
     });
-    
+
     // 防止模态框内容区域的点击事件冒泡到模态框外层
     const modalContent = document.querySelector('#customInputModal .modal-content');
     if (modalContent) {
@@ -182,7 +182,7 @@ class DiagnosisApp {
     const doctorDiagnosis = document.getElementById('doctorDiagnosis');
     const doctorMedication = document.getElementById('doctorMedication');
     const doctorSignature = document.getElementById('doctorSignature');
-    
+
     if (doctorDiagnosis) {
       doctorDiagnosis.addEventListener('input', (e) => {
         this.doctorInfo.diagnosis = e.target.value;
@@ -190,7 +190,7 @@ class DiagnosisApp {
         this.updateCardStatus();
       });
     }
-    
+
     if (doctorMedication) {
       doctorMedication.addEventListener('input', (e) => {
         this.doctorInfo.medication = e.target.value;
@@ -198,7 +198,7 @@ class DiagnosisApp {
         this.updateCardStatus();
       });
     }
-    
+
     if (doctorSignature) {
       doctorSignature.addEventListener('input', (e) => {
         this.doctorInfo.signature = e.target.value;
@@ -214,14 +214,14 @@ class DiagnosisApp {
     this.currentQuestion = 1;
     this.totalQuestions = 4;
     this.answers = {};
-    
+
     // 初始化医生填写部分
     this.doctorInfo = {
       diagnosis: '',
       medication: '',
       signature: ''
     };
-    
+
     // 从本地存储加载医生信息（如果有）
     const savedDoctorInfo = localStorage.getItem('doctorInfo');
     if (savedDoctorInfo) {
@@ -243,7 +243,7 @@ class DiagnosisApp {
     const now = new Date();
     document.getElementById('cardDate').textContent =
       `${now.getFullYear()}-${(now.getMonth() + 1).toString().padStart(2, '0')}-${now.getDate().toString().padStart(2, '0')}`;
-    
+
     // 初始化卡片状态（不根据历史记录预先推荐科室，保持“分析中...”）
     setTimeout(() => {
       this.updateCardStatus();
@@ -253,10 +253,10 @@ class DiagnosisApp {
   updateDepartmentRecommendation() {
     // 从历史记录中提取去重后的所有症状
     const uniqueSymptoms = [...new Set(this.history.map(item => item.text))];
-    
+
     // 调用推荐函数，获取推荐科室
     const recommendedDept = this.recommendDepartment(uniqueSymptoms);
-    
+
     // 更新"就医辅助卡"上的UI
     const recommendationEl = document.getElementById('departmentRecommendationValue');
     if (recommendationEl) {
@@ -272,11 +272,11 @@ class DiagnosisApp {
       const itemDate = new Date(item.timestamp);
       return itemDate >= today;
     });
-    
+
     // 更新今日识别次数
     const todayTotalCount = todayRecords.length;
     document.getElementById('recognitionCount').textContent = todayTotalCount;
-    
+
     const todayCorrectCount = todayRecords.filter(item => !item.isError).length;
     const successRate = todayTotalCount > 0 ?
       Math.round((todayCorrectCount / todayTotalCount) * 100) : 0;
@@ -346,17 +346,17 @@ class DiagnosisApp {
     try {
       // 捕获当前帧
       const imageData = this.captureFrame();
-      
+
       // 调用后端API进行识别
       const result = await signLanguageAPI.recognize(imageData);
-      
+
       if (result.success && result.result) {
         // 添加识别结果（传递置信度）
         this.addRecognitionResult(result.result, result.confidence);
-        
+
         // 更新UI
         this.updateUI();
-        
+
         // 显示成功消息
         showMessage(`识别成功: ${result.result}`, 'success');
       } else {
@@ -404,7 +404,7 @@ class DiagnosisApp {
     const resultItem = document.createElement('div');
     resultItem.className = 'result-item';
     const recordId = `record_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-    
+
     resultItem.innerHTML = `
             <div class="result-header">
                 <div class="result-time">${time}</div>
@@ -427,9 +427,9 @@ class DiagnosisApp {
       isError: false, // 默认未标记为错误
       confidence: confidence || null // 如果有置信度，保存它
     };
-    
+
     this.history.unshift(historyRecord);
-    
+
     // 添加报错按钮事件监听
     const errorBtn = resultItem.querySelector('.btn-error-report');
     if (errorBtn) {
@@ -452,14 +452,14 @@ class DiagnosisApp {
   reportError(recordId, resultItem) {
     // 找到对应的历史记录
     const recordIndex = this.history.findIndex(item => item.id === recordId);
-    
+
     if (recordIndex !== -1) {
       // 更新历史记录中的错误标记
       this.history[recordIndex].isError = true;
-      
+
       // 保存到本地存储
       localStorage.setItem('diagnosisHistory', JSON.stringify(this.history));
-      
+
       // 更新UI显示
       if (resultItem) {
         resultItem.classList.add('result-error');
@@ -470,9 +470,9 @@ class DiagnosisApp {
           errorBtn.disabled = true;
         }
       }
-      
+
       showMessage('已标记为识别错误，将用于计算准确率', 'success');
-      
+
       // 更新历史记录列表显示
       this.updateHistoryList();
     } else {
@@ -512,13 +512,13 @@ class DiagnosisApp {
       if (item.isError === undefined) {
         item.isError = false;
       }
-      
+
       const historyItem = document.createElement('div');
       historyItem.className = 'history-item';
-      
+
       // 如果标记为错误，添加视觉提示
       const errorBadge = item.isError ? '<span class="error-badge" style="color: var(--danger-color); font-size: 0.75rem;"><i class="fas fa-exclamation-triangle"></i> 已报错</span>' : '';
-      
+
       historyItem.innerHTML = `
                 <div class="history-content">
                     <div class="history-text">${item.text} ${errorBadge}</div>
@@ -777,21 +777,21 @@ class DiagnosisApp {
   updateCardStatus() {
     // 检查患者是否回答完所有问题
     const patientAnswered = Object.keys(this.answers).filter(key => !key.endsWith('_custom')).length === this.totalQuestions;
-    
+
     // 检查医生是否填写完所有信息
-    const doctorFilled = this.doctorInfo.diagnosis.trim() !== '' && 
-                         this.doctorInfo.medication.trim() !== '' && 
+    const doctorFilled = this.doctorInfo.diagnosis.trim() !== '' &&
+                         this.doctorInfo.medication.trim() !== '' &&
                          this.doctorInfo.signature.trim() !== '';
-    
+
     // 只有患者和医生都完成，才算完成
     const allComplete = patientAnswered && doctorFilled;
-    
+
     // 更新生成卡片按钮状态
     const generateBtn = document.getElementById('generateCard');
     if (generateBtn) {
       generateBtn.disabled = !allComplete;
     }
-    
+
     // 更新状态徽章
     const statusBadge = document.querySelector('.status-badge');
     if (statusBadge) {
@@ -831,7 +831,7 @@ class DiagnosisApp {
         recommendedDept = dept;
       }
     }
-    
+
     if (highestScore === 0 && symptoms.length > 0) {
       recommendedDept = "暂无明确指向，建议咨询全科";
     }
@@ -858,17 +858,17 @@ class DiagnosisApp {
       const painLevelEl = document.getElementById('painLevelValue');
       const otherSymptomsEl = document.getElementById('otherSymptomsValue');
       const aggravatingEl = document.getElementById('aggravatingValue');
-      
+
       if (symptomEl) symptomEl.textContent = symptomDisplay;
       if (durationEl) durationEl.textContent = durationDisplay;
       if (painLevelEl) painLevelEl.textContent = painLevelDisplay;
       if (otherSymptomsEl) otherSymptomsEl.textContent = otherSymptomsDisplay;
-      
+
       // 更新医生填写部分（如果有输入框，显示值；否则显示文本）
       const diagnosisInput = document.getElementById('doctorDiagnosis');
       const medicationInput = document.getElementById('doctorMedication');
       const signatureInput = document.getElementById('doctorSignature');
-      
+
       if (diagnosisInput) {
         diagnosisInput.value = this.doctorInfo.diagnosis || '';
       }
@@ -878,7 +878,7 @@ class DiagnosisApp {
       if (signatureInput) {
         signatureInput.value = this.doctorInfo.signature || '';
       }
-      
+
       // --- 推荐科室功能 ---
       // 1. 收集所有已知的症状（仅从答案中）
       const allSymptoms = [];
